@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  ollama:
+    container_name: document-qa-ollama
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - document-qa-network
+  mongodb:
+    image: mongo:7.0
+    container_name: document-qa-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init.js:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: document-summary
+    command: --auth
+    networks:
+      - document-qa-network
+volumes:
+  ollama_data:
+    driver: local
+  mongodb_data:
+    driver: local
+
+networks:
+  document-qa-network:
+    driver: bridge
+

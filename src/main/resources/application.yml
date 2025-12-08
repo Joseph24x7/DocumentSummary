@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: document-summary
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: llama3.1:8b
+  data:
+    mongodb:
+      uri: mongodb://root:example@localhost:27017/document-summary?authSource=admin
+      database: document-summary
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 1MB
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+
+# Application Configuration
+app:
+  max-file-size: 1048576 # 1 MB in bytes
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.docqa: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

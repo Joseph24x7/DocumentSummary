@@ -1,0 +1,27 @@
+package com.docqa.service;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.ollama.OllamaChatModel;
+import org.springframework.stereotype.Service;
+
+@Service
+@Slf4j
+public class OllamaService {
+
+    private final OllamaChatModel ollama;
+
+    public OllamaService(OllamaChatModel ollama) {
+        this.ollama = ollama;
+    }
+
+    public String generateText(String prompt) {
+        try {
+            return ollama.call(prompt);
+        } catch (Exception e) {
+            log.error("Error generating text from Ollama model", e);
+            throw new RuntimeException("Failed to generate text from Ollama model", e);
+        }
+    }
+
+}
+
