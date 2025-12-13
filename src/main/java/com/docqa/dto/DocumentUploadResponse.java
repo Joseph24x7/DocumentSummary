@@ -12,5 +12,9 @@ import lombok.NoArgsConstructor;
 public class DocumentUploadResponse {
     private String query;
     private String response;
+    private String sessionId;      // Chat session ID for continuing conversation
+    private String documentId;     // Document ID for reference
 }
+
+
 

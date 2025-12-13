@@ -2,6 +2,8 @@ package com.docqa.controller;
 
 import com.docqa.dto.DocumentUploadResponse;
 import com.docqa.service.DocumentService;
+import com.docqa.service.ChatService;
+import com.docqa.model.ChatSession;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,11 +21,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class DocumentController {
 
     private final DocumentService documentService;
-
+    private final ChatService chatService;
     private final long maxFileSize;
 
-    public DocumentController(DocumentService documentService, @Value("${app.max-file-size:1048576}") long maxFileSize) {
+    public DocumentController(DocumentService documentService,
+                            ChatService chatService,
+                            @Value("${app.max-file-size:1048576}") long maxFileSize) {
         this.documentService = documentService;
+        this.chatService = chatService;
         this.maxFileSize = maxFileSize;
     }
 
@@ -35,9 +40,28 @@ public class DocumentController {
 
         validateFile(file);
 
-        String response = documentService.uploadAndProcessDocument(file, query);
+        // Upload and process document
+        String documentId = documentService.uploadDocument(file);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(DocumentUploadResponse.builder().query(query).response(response).build());
+        // Create chat session for this document
+        ChatSession session = chatService.startChatSession(documentId);
+
+        // Get initial response if query provided
+        String initialResponse = null;
+        if (query != null && !query.trim().isEmpty()) {
+            initialResponse = chatService.chat(session.getId(), query);
+        } else {
+            initialResponse = "Document loaded successfully! Ask me any questions about the document.";
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            DocumentUploadResponse.builder()
+                .query(query)
+                .response(initialResponse)
+                .sessionId(session.getId())
+                .documentId(documentId)
+                .build()
+        );
     }
 
     private void validateFile(MultipartFile file) {

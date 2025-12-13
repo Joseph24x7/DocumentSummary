@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import './DocumentUpload.css';
 import { uploadDocument } from '../api/documentApi';
 
-export default function DocumentUpload() {
+export default function DocumentUpload({ onUploadComplete }) {
   const [file, setFile] = useState(null);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -79,7 +79,17 @@ export default function DocumentUpload() {
 
     try {
       const result = await uploadDocument(file, query);
-      setResponse(result.data);
+      const uploadData = result.data;
+
+      // Store response with session ID for chatbot
+      setResponse({
+        sessionId: uploadData.sessionId,
+        documentId: uploadData.documentId,
+        documentName: file.name,
+        query: uploadData.query,
+        response: uploadData.response,
+      });
+
       setFile(null);
       setQuery('');
       if (fileInputRef.current) {
@@ -203,47 +213,39 @@ export default function DocumentUpload() {
           </div>
         </form>
 
-        {/* Response Display */}
+        {/* Response Display - Initial Message Before Chat */}
         {response && (
           <div className="response-container">
             <div className="response-header">
-              <h3>✨ Results</h3>
-              <span className="success-badge">Success</span>
+              <h3>✨ Document Loaded Successfully!</h3>
+              <span className="success-badge">Ready</span>
             </div>
 
             <div className="response-content">
               {response.query && (
                 <div className="response-section">
-                  <div className="response-label">📋 Your Question:</div>
+                  <div className="response-label">📋 Initial Question:</div>
                   <div className="response-text">{response.query}</div>
-                  <button
-                    className="copy-button"
-                    onClick={() => copyToClipboard(response.query, 0)}
-                  >
-                    {copiedIndex === 0 ? '✓ Copied' : 'Copy'}
-                  </button>
                 </div>
               )}
 
               <div className="response-section">
-                <div className="response-label">🤖 AI Response:</div>
+                <div className="response-label">🤖 Initial Response:</div>
                 <div className="response-text">{response.response}</div>
-                <button
-                  className="copy-button"
-                  onClick={() => copyToClipboard(response.response, 1)}
-                >
-                  {copiedIndex === 1 ? '✓ Copied' : 'Copy'}
-                </button>
               </div>
             </div>
 
             <button
               type="button"
               className="btn btn-primary"
-              onClick={handleReset}
+              onClick={() => {
+                if (onUploadComplete) {
+                  onUploadComplete(response);
+                }
+              }}
               style={{ marginTop: '20px', width: '100%' }}
             >
-              📤 Upload Another Document
+              💬 Continue Chat
             </button>
           </div>
         )}

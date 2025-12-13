@@ -46,6 +46,25 @@ public class DocumentService {
         return response;
     }
 
+    /**
+     * Upload a document and return its ID (for chatbot integration)
+     */
+    public String uploadDocument(MultipartFile file) {
+        log.info("Uploading document: {}, file size: {}", file.getOriginalFilename(), file.getSize());
+
+        String fileHash = FileHashUtil.calculateFileHash(file);
+        log.info("Calculated file hash: {}", fileHash);
+
+        DocumentEntity document = documentRepository.findByFileHash(fileHash)
+                .orElseGet(() -> createNewDocument(file, fileHash));
+
+        document.setUpdatedAt(LocalDateTime.now());
+        documentRepository.save(document);
+
+        log.info("Document saved with ID: {}", document.getId());
+        return document.getId();
+    }
+
     private DocumentEntity createNewDocument(MultipartFile file, String fileHash) {
         log.info("Duplicate PDF detected! File hash {} already exists. Reusing cached content from file: {}",
                 fileHash, file.getOriginalFilename());
