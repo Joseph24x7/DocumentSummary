@@ -12,7 +12,6 @@ A modern Spring Boot 4.0.0 backend application for document Q&A powered by Ollam
 - **🐳 Docker Support**: Complete Docker Compose setup with Ollama and MongoDB
 - **✅ Input Validation**: Comprehensive validation for all API inputs
 - **🚨 Global Exception Handling**: Centralized error handling with detailed responses
-- **📊 Logging**: Structured logging throughout the application
 
 ## 🏗️ Architecture
 
