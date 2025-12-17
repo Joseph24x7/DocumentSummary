@@ -7,11 +7,14 @@ A full-stack application combining **React + Vite** frontend with **Spring Boot*
 - **📄 PDF Upload**: Upload PDF documents (max 1 MB) with automatic text extraction
 - **🤖 AI-Powered Chat**: Ask questions about documents using local Ollama LLM
 - **💬 Chatbot Memory**: Conversations remember previous messages and document context
+- **⚡ Real-time WebSocket**: Live chat with instant message delivery using WebSocket/STOMP
+- **🔌 Connection Status**: Visual indicator showing WebSocket connection state
 - **🔐 Session Management**: Each document gets its own chat session
 - **⚡ Single Port**: Frontend and backend run on **port 8080**
 - **🐳 Docker Support**: Complete Docker Compose setup with Ollama, MongoDB, and Spring Boot
 - **✅ Input Validation**: File type and size validation
 - **🚨 Error Handling**: Centralized exception handling with detailed error responses
+- **🔄 Auto-reconnect**: Automatic WebSocket reconnection on connection loss
 
 ## 🏗️ Project Structure
 
@@ -102,6 +105,37 @@ Send a question about the document and get an AI response.
   ]
 }
 ```
+
+### 3. WebSocket Chat (Real-time)
+**WebSocket Endpoint:** `ws://localhost:8080/ws`
+
+Connect to WebSocket for live chat updates.
+
+**Subscribe to:** `/topic/chat/{sessionId}`
+
+**Send to:** `/app/chat/message`
+
+**Message Format:**
+```json
+{
+  "sessionId": "sess-123456",
+  "question": "What is the main topic?"
+}
+```
+
+**Received Messages:**
+```json
+{
+  "role": "user" | "assistant" | "error",
+  "content": "Message content"
+}
+```
+
+**Features:**
+- 🔴/🟢 Connection status indicator
+- Real-time message delivery
+- Automatic reconnection
+- SockJS fallback for older browsers
 
 ## 🚀 Quick Start
 
@@ -194,6 +228,7 @@ Frontend is built into the Spring Boot JAR and served from `/` route.
 
 **Backend:**
 - Spring Boot 3.5.7 (Java 21)
+- Spring WebSocket & STOMP (Real-time messaging)
 - Spring Data MongoDB
 - Spring AI (Ollama integration)
 - Apache PDFBox (PDF extraction)
@@ -203,6 +238,7 @@ Frontend is built into the Spring Boot JAR and served from `/` route.
 - React 18+
 - Vite
 - Axios (API calls)
+- STOMP.js & SockJS (WebSocket client)
 
 **Infrastructure:**
 - Ollama (LLM)
@@ -212,6 +248,7 @@ Frontend is built into the Spring Boot JAR and served from `/` route.
 ## 📝 Environment Variables
 
 ```bash
+
 # Ollama Configuration
 SPRING_AI_OLLAMA_BASE_URL=http://ollama:11434
 SPRING_AI_OLLAMA_CHAT_MODEL=llama3.1:8b
@@ -323,10 +360,13 @@ Change in `application.yml`:
 
 See `pom.xml` for complete list:
 - spring-boot-starter-web
+- spring-boot-starter-websocket
 - spring-boot-starter-data-mongodb
 - spring-ai-starter-model-ollama
 - pdfbox
 - springdoc-openapi (Swagger UI)
+- sockjs-client (Frontend)
+- @stomp/stompjs (Frontend)
 
 ## 📞 Support
 

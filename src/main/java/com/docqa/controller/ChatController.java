@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,17 +24,72 @@ import java.util.stream.Collectors;
 public class ChatController {
 
     private final ChatService chatService;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public ChatController(ChatService chatService) {
+    public ChatController(ChatService chatService, SimpMessagingTemplate messagingTemplate) {
         this.chatService = chatService;
+        this.messagingTemplate = messagingTemplate;
     }
 
     /**
-     * Send a message to the chatbot and get a response
+     * WebSocket handler for chat messages
+     * Clients should send to: /app/chat/message
+     * Clients should subscribe to: /topic/chat/{sessionId}
+     */
+    @MessageMapping("/chat/message")
+    public void handleChatMessage(ChatMessageRequest request) {
+        log.info("Received WebSocket chat message for session: {}", request.getSessionId());
+
+        if (request.getSessionId() == null || request.getSessionId().isEmpty()) {
+            log.error("handleChatMessage: Session ID is required");
+            sendErrorMessage(request.getSessionId(), "Session ID is required");
+            return;
+        }
+
+        if (request.getQuestion() == null || request.getQuestion().isEmpty()) {
+            log.error("Question is required");
+            sendErrorMessage(request.getSessionId(), "Question is required");
+            return;
+        }
+
+        try {
+            // Send user message confirmation
+            ChatMessageDto userMsg = ChatMessageDto.builder()
+                    .role("user")
+                    .content(request.getQuestion())
+                    .build();
+            messagingTemplate.convertAndSend("/topic/chat/" + request.getSessionId(), userMsg);
+
+            // Process the chat message
+            String response = chatService.chat(request.getSessionId(), request.getQuestion());
+
+            // Send assistant response
+            ChatMessageDto assistantMsg = ChatMessageDto.builder()
+                    .role("assistant")
+                    .content(response)
+                    .build();
+            messagingTemplate.convertAndSend("/topic/chat/" + request.getSessionId(), assistantMsg);
+
+        } catch (RuntimeException e) {
+            log.error("Error processing chat message", e);
+            sendErrorMessage(request.getSessionId(), "Error processing message: " + e.getMessage());
+        }
+    }
+
+    private void sendErrorMessage(String sessionId, String errorMessage) {
+        ChatMessageDto errorMsg = ChatMessageDto.builder()
+                .role("error")
+                .content(errorMessage)
+                .build();
+        messagingTemplate.convertAndSend("/topic/chat/" + sessionId, errorMsg);
+    }
+
+    /**
+     * REST API: Send a message to the chatbot and get a response (kept for backward compatibility)
      */
     @PostMapping(value = "/message", consumes = "application/json", produces = "application/json")
     public ResponseEntity<ChatSessionResponse> sendMessage(@RequestBody ChatMessageRequest request) {
-        log.info("Received chat message for session: {}", request.getSessionId());
+        log.info("Received REST chat message for session: {}", request.getSessionId());
 
         if (request.getSessionId() == null || request.getSessionId().isEmpty()) {
             log.error("sendMessage: Session ID is required");

@@ -1,17 +1,76 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './ChatBot.css';
-import { sendChatMessage, getChatSession } from '../api/documentApi';
+import { getChatSession } from '../api/documentApi';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
 export default function ChatBot({ sessionId, documentName, onUploadNew }) {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [connected, setConnected] = useState(false);
   const messagesEndRef = useRef(null);
+  const stompClientRef = useRef(null);
 
   // Load chat history on mount
   useEffect(() => {
     loadChatHistory();
+  }, [sessionId]);
+
+  // Setup WebSocket connection
+  useEffect(() => {
+    // Use environment variable if available, otherwise construct URL from current location
+    const wsUrl = import.meta.env.VITE_WS_URL || `${window.location.protocol}//${window.location.host}/ws`;
+
+    const client = new Client({
+      webSocketFactory: () => new SockJS(wsUrl),
+      debug: (str) => {
+        console.log('STOMP: ' + str);
+      },
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      onConnect: () => {
+        console.log('WebSocket Connected');
+        setConnected(true);
+
+        // Subscribe to messages for this session
+        client.subscribe(`/topic/chat/${sessionId}`, (message) => {
+          const receivedMessage = JSON.parse(message.body);
+          console.log('Received message:', receivedMessage);
+
+          if (receivedMessage.role === 'error') {
+            setError(`❌ ${receivedMessage.content}`);
+            setLoading(false);
+          } else {
+            setMessages((prev) => [...prev, receivedMessage]);
+            if (receivedMessage.role === 'assistant') {
+              setLoading(false);
+            }
+          }
+        });
+      },
+      onStompError: (frame) => {
+        console.error('STOMP error:', frame);
+        setError('WebSocket connection error');
+        setConnected(false);
+      },
+      onWebSocketClose: () => {
+        console.log('WebSocket Disconnected');
+        setConnected(false);
+      },
+    });
+
+    client.activate();
+    stompClientRef.current = client;
+
+    // Cleanup on unmount
+    return () => {
+      if (client) {
+        client.deactivate();
+      }
+    };
   }, [sessionId]);
 
   // Scroll to bottom when messages change
@@ -38,39 +97,29 @@ export default function ChatBot({ sessionId, documentName, onUploadNew }) {
 
     if (!inputValue.trim()) return;
 
+    if (!connected) {
+      setError('❌ WebSocket not connected. Please wait...');
+      return;
+    }
+
     const userMessage = inputValue.trim();
     setInputValue('');
     setError(null);
-
-    // Add user message to UI
-    const newUserMessage = {
-      role: 'user',
-      content: userMessage,
-    };
-    setMessages((prev) => [...prev, newUserMessage]);
-
     setLoading(true);
 
     try {
-      const response = await sendChatMessage(sessionId, userMessage);
-
-      // Add assistant response to UI
-      const assistantMessage = {
-        role: 'assistant',
-        content: response.data.currentResponse,
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
+      // Send message via WebSocket
+      stompClientRef.current.publish({
+        destination: '/app/chat/message',
+        body: JSON.stringify({
+          sessionId: sessionId,
+          question: userMessage,
+        }),
+      });
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message ||
-        err.message ||
-        'Failed to get response. Please try again.';
+      const errorMessage = err.message || 'Failed to send message. Please try again.';
       setError(`❌ ${errorMessage}`);
       console.error('Chat error:', err);
-
-      // Remove the user message if request failed
-      setMessages((prev) => prev.slice(0, -1));
-    } finally {
       setLoading(false);
     }
   };
@@ -89,7 +138,12 @@ export default function ChatBot({ sessionId, documentName, onUploadNew }) {
         <div className="chat-header">
           <div>
             <h2>💬 Chat with Document</h2>
-            <div className="document-info">📄 {documentName}</div>
+            <div className="document-info">
+              📄 {documentName}
+              <span className={`connection-status ${connected ? 'connected' : 'disconnected'}`}>
+                {connected ? '🟢' : '🔴'}
+              </span>
+            </div>
           </div>
           <button className="upload-new-btn" onClick={onUploadNew}>
             📤 Upload New
@@ -150,14 +204,14 @@ export default function ChatBot({ sessionId, documentName, onUploadNew }) {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Ask a question about the document..."
-              disabled={loading}
+              disabled={loading || !connected}
               rows="1"
             />
             <button
               className="send-btn"
               onClick={handleSendMessage}
-              disabled={loading || !inputValue.trim()}
-              title={loading ? 'Processing...' : 'Send message'}
+              disabled={loading || !inputValue.trim() || !connected}
+              title={loading ? 'Processing...' : !connected ? 'Connecting...' : 'Send message'}
             >
               {loading ? (
                 <div className="spinner-small"></div>

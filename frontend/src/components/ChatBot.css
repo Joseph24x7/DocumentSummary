@@ -38,6 +38,27 @@
   color: var(--text-light);
   font-size: 0.9em;
   margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.connection-status {
+  font-size: 0.7em;
+  transition: all 0.3s ease;
+}
+
+.connection-status.connected {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .upload-new-btn {
@@ -310,4 +331,3 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(102, 126, 234, 0.7);
 }
-
