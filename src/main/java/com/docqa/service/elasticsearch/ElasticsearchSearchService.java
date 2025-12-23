@@ -23,16 +23,16 @@ public class ElasticsearchSearchService {
 
     private final ElasticsearchClient elasticsearchClient;
 
-    @Value("${elasticsearch.index.sessions:chat-sessions}")
+    @Value("${elasticsearch.index.sessions}")
     private String sessionsIndex;
 
-    @Value("${elasticsearch.search.max-results:50}")
+    @Value("${elasticsearch.search.max-results}")
     private int maxResults;
 
-    @Value("${elasticsearch.search.fuzzy-enabled:true}")
+    @Value("${elasticsearch.search.fuzzy-enabled}")
     private boolean fuzzyEnabled;
 
-    @Value("${elasticsearch.search.fuzzy-distance:2}")
+    @Value("${elasticsearch.search.fuzzy-distance}")
     private int fuzzyDistance;
 
     public ElasticsearchSearchService(ElasticsearchClient elasticsearchClient) {

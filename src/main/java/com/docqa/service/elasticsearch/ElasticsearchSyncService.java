@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -21,7 +20,7 @@ public class ElasticsearchSyncService {
     private final ChatSessionRepository mongoRepository;
     private final ElasticsearchClient elasticsearchClient;
 
-    @Value("${elasticsearch.index.sessions:chat-sessions}")
+    @Value("${elasticsearch.index.sessions}")
     private String sessionsIndex;
 
     public ElasticsearchSyncService(ChatSessionRepository mongoRepository,
@@ -58,7 +57,7 @@ public class ElasticsearchSyncService {
 
             List<ChatSessionDocument> documents = allSessions.stream()
                     .map(this::toDocument)
-                    .collect(Collectors.toList());
+                    .toList();
 
             // Bulk save using Elasticsearch Java Client
             elasticsearchClient.bulk(b -> {

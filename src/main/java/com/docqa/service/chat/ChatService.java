@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 @Service
 @Slf4j
@@ -84,45 +83,6 @@ public class ChatService {
         }
 
         return assistantResponse;
-    }
-
-    public void chatStream(String sessionId, String userMessage,
-                          Consumer<String> onToken,
-                          Consumer<String> onComplete,
-                          Consumer<Throwable> onError) {
-        log.info("Processing streaming chat message for session: {}", sessionId);
-
-        try {
-            ChatSession session = getChatSession(sessionId);
-
-            ChatMessage userMsg = new ChatMessage("user", userMessage);
-            session.addMessage(userMsg);
-            chatSessionRepository.save(session);
-
-            String prompt = PromptBuilder.buildContextualPrompt(session, userMessage);
-
-            ollamaService.streamText(
-                prompt,
-                onToken,
-                completeResponse -> {
-                    ChatMessage assistantMsg = new ChatMessage("assistant", completeResponse);
-                    session.addMessage(assistantMsg);
-                    chatSessionRepository.save(session);
-
-                    // Sync to Elasticsearch for fast search (if available)
-                    if (elasticsearchSyncService != null) {
-                        elasticsearchSyncService.syncSession(session);
-                    }
-
-                    onComplete.accept(completeResponse);
-                },
-                onError
-            );
-
-        } catch (Exception e) {
-            log.error("Error in chatStream", e);
-            onError.accept(e);
-        }
     }
 
     public List<ChatSession> getAllSessions() {

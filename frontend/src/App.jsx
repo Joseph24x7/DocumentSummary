@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SessionList from './components/SessionList';
 import DocumentUpload from './components/DocumentUpload';
 import ChatBot from './components/ChatBot';
@@ -7,6 +7,11 @@ import './App.css';
 function App() {
   const [view, setView] = useState('sessions'); // 'sessions', 'upload', 'chat'
   const [chatSession, setChatSession] = useState(null);
+
+  // Enable dark mode on mount
+  useEffect(() => {
+    document.body.classList.add('theme-dark');
+  }, []);
 
   const handleSelectSession = (session) => {
     // Navigate to chat with selected session

@@ -1,149 +1,297 @@
-.file-input {
-  display: none;
+/* ==========================================
+   DOCUMENT UPLOAD - Card Layout (Like SessionList)
+   ========================================== */
+
+/* ==========================================
+   Page & Card Layout
+   ========================================== */
+
+.upload-page {
+  /* Inherits from ds-page: padding and background */
 }
 
-.document-upload-page {
-  /* Uses ds-page from design system */
-}
-
-.document-upload-card {
+.upload-card {
   max-width: 900px;
   margin: 0 auto;
-  /* Uses ds-card from design system */
+  /* Inherits from ds-card: background, border-radius, shadow, padding */
 }
 
-.upload-area {
-  border: 2px dashed var(--border-secondary);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-3xl);
-  text-align: center;
-  cursor: pointer;
-  transition: all var(--transition-base);
-  background: var(--bg-secondary);
-}
+/* ==========================================
+   Upload Form
+   ========================================== */
 
-.upload-area:hover {
-  border-color: var(--primary-color);
-  background: var(--bg-tertiary);
-  transform: scale(1.01);
-}
-
-.upload-area.drag-over {
-  border-color: var(--primary-color);
-  background: rgba(102, 126, 234, 0.05);
-  transform: scale(1.01);
-}
-
-.upload-icon {
-  font-size: 48px;
-  margin-bottom: var(--spacing-lg);
-  opacity: 0.7;
-}
-
-.upload-text h3 {
-  color: var(--text-primary);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-medium);
-  margin-bottom: var(--spacing-sm);
-}
-
-.upload-text p {
-  color: var(--text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-.file-selected-badge {
+.upload-form {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md);
-  background: var(--bg-tertiary);
-  border-left: 3px solid var(--success-color);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-}
-
-.button-group {
-  display: flex;
-  gap: var(--spacing-md);
+  flex-direction: column;
+  gap: var(--spacing-xl);
   margin-top: var(--spacing-xl);
 }
 
-.error-banner {
-  background: #fee;
-  color: var(--error-color);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
-  margin-top: var(--spacing-lg);
-  border-left: 3px solid var(--error-color);
-  font-size: var(--font-size-sm);
-}
+/* ==========================================
+   Drop Zone
+   ========================================== */
 
-.response-container {
-  margin-top: var(--spacing-2xl);
-  padding: var(--spacing-2xl);
+.upload-dropzone {
+  position: relative;
+  min-height: 260px;
+  padding: var(--spacing-3xl);
   background: var(--bg-secondary);
+  border: 2px dashed var(--border-secondary);
   border-radius: var(--radius-lg);
-  border-left: 4px solid var(--success-color);
-}
-
-.response-header {
+  cursor: pointer;
+  transition: all var(--transition-base);
   display: flex;
-  gap: var(--spacing-md);
   align-items: center;
-  margin-bottom: var(--spacing-xl);
+  justify-content: center;
 }
 
-.response-header h3 {
-  color: var(--text-primary);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  margin: 0;
+.upload-dropzone:hover,
+.upload-dropzone.drag-over {
+  border-color: var(--primary-color);
+  background: var(--bg-tertiary);
+  transform: scale(1.005);
 }
 
-.response-content {
+.upload-dropzone.has-file {
+  border-color: var(--success-color);
+  border-style: solid;
+  background: var(--bg-tertiary);
+}
+
+.upload-input {
+  display: none;
+}
+
+/* Empty State */
+.dropzone-empty {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  align-items: center;
+  gap: var(--spacing-md);
+  text-align: center;
 }
 
-.response-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
+.dropzone-icon {
+  font-size: 72px;
+  opacity: 0.6;
+  transition: opacity var(--transition-base);
 }
 
-.response-label {
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
+.upload-dropzone:hover .dropzone-icon {
+  opacity: 0.9;
+}
+
+.dropzone-text {
   font-size: var(--font-size-base);
-}
-
-.response-text {
   color: var(--text-primary);
   line-height: var(--line-height-relaxed);
-  white-space: pre-wrap;
-  word-break: break-word;
-  background: var(--bg-primary);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
-  border-left: 3px solid var(--primary-color);
-  font-size: var(--font-size-base);
 }
 
+.dropzone-text strong {
+  color: var(--primary-color);
+  font-weight: var(--font-weight-semibold);
+}
+
+.dropzone-hint {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+/* File Selected State */
+.file-selected {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  width: 100%;
+  padding: var(--spacing-md);
+}
+
+.file-icon {
+  font-size: 56px;
+  flex-shrink: 0;
+}
+
+.file-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.file-name {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+.file-size {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.file-check {
+  font-size: 40px;
+  color: var(--success-color);
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   Textarea (Using design system)
+   ========================================== */
+
+.upload-textarea {
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* ==========================================
+   Error Message
+   ========================================== */
+
+.upload-error {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-left: 3px solid var(--error-color);
+  border-radius: var(--radius-md);
+  color: var(--error-color);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+}
+
+.error-icon {
+  flex-shrink: 0;
+  font-size: var(--font-size-xl);
+}
+
+.error-text {
+  flex: 1;
+}
+
+/* ==========================================
+   Action Buttons
+   ========================================== */
+
+.upload-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.upload-actions > * {
+  flex: 1;
+}
+
+/* ==========================================
+   Success State
+   ========================================== */
+
+.upload-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xl);
+  text-align: center;
+  padding: var(--spacing-3xl) var(--spacing-xl);
+  margin-top: var(--spacing-xl);
+}
+
+.success-icon {
+  font-size: 80px;
+  animation: scale-in 0.5s ease-out;
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.success-title {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.success-message {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
+  max-width: 600px;
+}
+
+.success-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 100%;
+  max-width: 400px;
+  margin-top: var(--spacing-lg);
+}
+
+/* ==========================================
+   Responsive Design
+   ========================================== */
+
 @media (max-width: 768px) {
-  .button-group {
-    flex-direction: column;
+  .upload-card {
+    max-width: 100%;
   }
 
-  .upload-area {
+  .upload-dropzone {
+    min-height: 220px;
     padding: var(--spacing-xl);
   }
 
-  .upload-icon {
-    font-size: 40px;
+  .dropzone-icon {
+    font-size: 56px;
+  }
+
+  .upload-actions {
+    flex-direction: column;
+  }
+
+  .upload-actions > * {
+    width: 100%;
+  }
+
+  .success-icon {
+    font-size: 64px;
+  }
+
+  .success-title {
+    font-size: var(--font-size-xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .upload-dropzone {
+    padding: var(--spacing-lg);
+  }
+
+  .file-selected {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .file-icon {
+    font-size: 48px;
+  }
+
+  .file-check {
+    font-size: 32px;
   }
 }
 

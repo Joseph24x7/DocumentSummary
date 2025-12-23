@@ -3,10 +3,10 @@
    ========================================== */
 
 :root {
-  /* Brand Colors */
-  --primary-color: #667eea;
-  --primary-dark: #5568d3;
-  --primary-light: #8b9df8;
+  /* Brand Colors - ChatGPT-inspired */
+  --primary-color: #10a37f;
+  --primary-dark: #0d8968;
+  --primary-light: #1db88e;
 
   /* Semantic Colors */
   --success-color: #10b981;
@@ -14,20 +14,20 @@
   --warning-color: #f59e0b;
   --info-color: #3b82f6;
 
-  /* Neutral Palette */
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
-  --gray-400: #9ca3af;
-  --gray-500: #6b7280;
-  --gray-600: #4b5563;
-  --gray-700: #374151;
-  --gray-800: #1f2937;
-  --gray-900: #111827;
+  /* Neutral Palette - More like ChatGPT */
+  --gray-50: #f7f7f8;
+  --gray-100: #ececf1;
+  --gray-200: #d9d9e3;
+  --gray-300: #c5c5d2;
+  --gray-400: #8e8ea0;
+  --gray-500: #565869;
+  --gray-600: #40414f;
+  --gray-700: #343541;
+  --gray-800: #202123;
+  --gray-900: #0d0d0d;
 
   /* Semantic Text Colors */
-  --text-primary: var(--gray-900);
+  --text-primary: var(--gray-800);
   --text-secondary: var(--gray-600);
   --text-tertiary: var(--gray-500);
 
@@ -35,6 +35,8 @@
   --bg-primary: #ffffff;
   --bg-secondary: var(--gray-50);
   --bg-tertiary: var(--gray-100);
+  --bg-chat-user: #f7f7f8;
+  --bg-chat-assistant: #ffffff;
 
   /* Border Colors */
   --border-primary: var(--gray-200);
@@ -249,7 +251,7 @@
 
 .ds-input:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 168, 132, 0.1);
 }
 
 .ds-input::placeholder {
@@ -446,6 +448,10 @@
   animation: ds-bounce 1.4s infinite ease-in-out;
 }
 
+.theme-dark .ds-typing-dot {
+  background: var(--gray-500);
+}
+
 .ds-typing-dot:nth-child(1) { animation-delay: 0s; }
 .ds-typing-dot:nth-child(2) { animation-delay: 0.2s; }
 .ds-typing-dot:nth-child(3) { animation-delay: 0.4s; }
@@ -609,3 +615,70 @@
   animation: ds-slide-up var(--transition-base);
 }
 
+/* ==========================================
+   DARK THEME (WhatsApp Style)
+   Enable with: <body class="theme-dark">
+   ========================================== */
+
+.theme-dark {
+  /* WhatsApp Brand Colors */
+  --primary-color: #00a884;
+  --primary-dark: #008c6e;
+  --primary-light: #25d366;
+
+  /* WhatsApp Dark Theme Palette */
+  --gray-50: #111b21;
+  --gray-100: #111b21;
+  --gray-200: #2a3942;
+  --gray-300: #3b4a54;
+  --gray-400: #667781;
+  --gray-500: #8696a0;
+  --gray-600: #aebac1;
+  --gray-700: #d1d7db;
+  --gray-800: #e9edef;
+  --gray-900: #ffffff;
+
+  /* Text */
+  --text-primary: #e9edef;
+  --text-secondary: #8696a0;
+  --text-tertiary: #667781;
+
+  /* Backgrounds - WhatsApp Dark */
+  --bg-primary: #111b21;        /* Main chat background */
+  --bg-secondary: #0b141a;      /* App background (darker) */
+  --bg-tertiary: #202c33;       /* Cards/panels */
+  --bg-chat-user: #005c4b;      /* User message bubble (WhatsApp green) */
+  --bg-chat-assistant: #202c33; /* Assistant message bubble (dark gray) */
+  --bg-chat-pattern: #0b141a;   /* Chat background with pattern */
+
+  /* Borders */
+  --border-primary: #2a3942;
+  --border-secondary: #3b4a54;
+  --border-focus: #00a884;
+
+  /* Shadows (subtle in dark UI) */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+
+  /* WhatsApp-specific colors */
+  --whatsapp-green: #00a884;
+  --whatsapp-green-dark: #005c4b;
+  --whatsapp-teal: #008069;
+  --whatsapp-blue: #53bdeb;
+}
+
+/* WhatsApp Chat Background Pattern */
+.theme-dark .chat-container {
+  background-color: var(--bg-chat-pattern);
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(255, 255, 255, 0.015) 10px,
+      rgba(255, 255, 255, 0.015) 20px
+    );
+}

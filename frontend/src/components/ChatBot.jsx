@@ -78,18 +78,15 @@ export default function ChatBot({ sessionId, documentName, onReset }) {
   };
 
   return (
-    <div className="chat-page ds-page">
+    <div className="chat-container">
       <div className="chat-card">
         {/* Chat Header */}
         <div className="chat-header">
           <div>
-            <h2 className="chat-title">💬 Chat with Document</h2>
-            <div className="chat-document-name">
-              📄 {documentName}
-            </div>
+            <h2 className="chat-title">💬 {documentName}</h2>
           </div>
-          <button className="ds-btn ds-btn-secondary" onClick={onReset}>
-            🔄 Reset / New Session
+          <button className="reset-btn" onClick={onReset}>
+            ← Back to Sessions
           </button>
         </div>
 
@@ -103,23 +100,38 @@ export default function ChatBot({ sessionId, documentName, onReset }) {
           ) : (
             <>
               {messages.map((msg, idx) => (
-                <div key={idx} className={`message ${msg.role}`}>
-                  <div className="message-avatar">
-                    {msg.role === 'user' ? '👤' : '🤖'}
+                <div key={idx} className={`message-wrapper ${msg.role}`}>
+                  <div className={`message ${msg.role}`}>
+                    {msg.role === 'assistant' && (
+                      <div className="message-avatar">
+                        🤖
+                      </div>
+                    )}
+                    <div className="message-bubble">
+                      <div className="message-content">{msg.content}</div>
+                    </div>
+                    {msg.role === 'user' && (
+                      <div className="message-avatar">
+                        👤
+                      </div>
+                    )}
                   </div>
-                  <div className="message-content">{msg.content}</div>
                 </div>
               ))}
             </>
           )}
 
           {loading && (
-            <div className="message assistant">
-              <div className="message-avatar">🤖</div>
-              <div className="ds-typing">
-                <div className="ds-typing-dot"></div>
-                <div className="ds-typing-dot"></div>
-                <div className="ds-typing-dot"></div>
+            <div className="message-wrapper assistant">
+              <div className="message assistant">
+                <div className="message-avatar">🤖</div>
+                <div className="message-bubble">
+                  <div className="ds-typing">
+                    <div className="ds-typing-dot"></div>
+                    <div className="ds-typing-dot"></div>
+                    <div className="ds-typing-dot"></div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -148,7 +160,7 @@ export default function ChatBot({ sessionId, documentName, onReset }) {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask a question about the document..."
+              placeholder="Message..."
               disabled={loading}
               rows="1"
             />
@@ -161,7 +173,7 @@ export default function ChatBot({ sessionId, documentName, onReset }) {
               {loading ? (
                 <div className="ds-spinner"></div>
               ) : (
-                <span>📤</span>
+                <span>↑</span>
               )}
             </button>
           </div>

@@ -17,7 +17,7 @@ public class ElasticsearchIndexService {
 
     private final ElasticsearchClient elasticsearchClient;
 
-    @Value("${elasticsearch.index.sessions:chat-sessions}")
+    @Value("${elasticsearch.index.sessions}")
     private String sessionsIndex;
 
     public ElasticsearchIndexService(ElasticsearchClient elasticsearchClient) {

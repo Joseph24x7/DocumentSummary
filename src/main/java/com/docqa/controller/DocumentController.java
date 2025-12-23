@@ -25,7 +25,7 @@ public class DocumentController {
 
     public DocumentController(DocumentService documentService,
                             ChatService chatService,
-                            @Value("${app.max-file-size:1048576}") long maxFileSize) {
+                            @Value("${app.max-file-size}") long maxFileSize) {
         this.documentService = documentService;
         this.chatService = chatService;
         this.maxFileSize = maxFileSize;
